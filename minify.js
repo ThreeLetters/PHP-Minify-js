@@ -27,7 +27,33 @@ function minify(str) {
     var len = str.length;
     var out = [];
     var i = 0;
+   var varIndex = [0];
+    var varChars = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
+    var varLen = varChars.length;
+    var varMap = {};
 
+   function getNextVar() {
+
+        var str = "";
+        var j = 0;
+        while (true) {
+            if (!varIndex[j]) varIndex[j] = 0; 
+            varIndex[j]++;
+
+            if (varIndex[j] > varLen) {
+                varIndex[j] = 1;
+            } else {
+                break;
+            }
+            j++;
+        }
+
+        for (var i = 0; i < varIndex.length; i++) {
+            str += varChars[varIndex[i] - 1];
+        }
+
+        return str;
+    }
     function skip(match) {
 
         var backslash = false;

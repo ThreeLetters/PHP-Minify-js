@@ -24,20 +24,21 @@ SOFTWARE.
 
 function minify(str) {
     str = str.replace(/\n/g, "").split("");
+    //str = str.split("");
     var len = str.length;
     var out = [];
     var i = 0;
-   var varIndex = [0];
+    var varIndex = [0];
     var varChars = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
     var varLen = varChars.length;
     var varMap = {};
 
-   function getNextVar() {
+    function getNextVar() {
 
         var str = "";
         var j = 0;
         while (true) {
-            if (!varIndex[j]) varIndex[j] = 0; 
+            if (!varIndex[j]) varIndex[j] = 0;
             varIndex[j]++;
 
             if (varIndex[j] > varLen) {
@@ -54,6 +55,7 @@ function minify(str) {
 
         return str;
     }
+
     function skip(match) {
 
         var backslash = false;
@@ -82,6 +84,13 @@ function minify(str) {
 
         return dt.indexOf(char) != -1;
     }
+
+    function includes3(char) {
+        var dt = ["_", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
+
+        return dt.indexOf(char.toLowerCase()) != -1;
+    }
+
     for (; i < len; i++) {
         var char = str[i];
 
@@ -91,6 +100,48 @@ function minify(str) {
             skip("'");
         } else if (char == "`") {
             skip("`");
+        } else if (char == "$") {
+
+            var v = "";
+            for (; i < len; i++) {
+
+                if (!includes3(str[i + 1])) break;
+                v += str[i + 1];
+            }
+
+
+            if (varMap[v]) {
+                out.push(varMap[v]);
+            } else {
+                var found = false;
+                for (var j = i; j < len; j++) {
+                    if (str[j + 1] == "=" || str[j + 1] == "," || str[j + 1] == ")") {
+                        found = true;
+                        break;
+                    } else if (str[j + 1] != " ") {
+                        break;
+                    }
+                }
+                if (found) {
+                    for (var j = i - v.length - 1; j > 0; j--) {
+                        if (str[j] == "c" || str[j] == "e" || str[j] == "l") {
+                            found = false;
+                            break;
+                        } else if (str[j] != " ") {
+                            break;
+                        }
+                    }
+                }
+                if (found) {
+                    varMap[v] = "$" + getNextVar();
+                    // console.log(v, varMap[v])
+                    out.push(varMap[v]);
+                } else {
+                    out.push("$" + v);
+                }
+            }
+            //console.log(v);
+
         } else if (char == " ") {
 
             var d = true;

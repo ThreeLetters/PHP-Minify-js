@@ -22,9 +22,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-function minify(str) {
-    str = str.replace(/\n/g, "").split("");
-    //str = str.split("");
+/**
+* Minify PHP code into a small version
+*
+* @param {String} str - PHP code to minify
+* @param {Object} options - Extra options (optional)
+*
+* Options available:
+* - varReplace - Replace variables (Default: true)
+* - extremeMinify - Remove all uneccessary whitespace (Default true)
+* - removeLine - Remove line breaks (Default: true)
+*/
+
+function minify(str,options) {
+    if (!options) options = {};
+    str = removeComments(str);
+    var varReplace = options.varReplace === undefined ? true : options.varReplace;
+    var extreme = options.extremeMinify === undefined ? true : options.extremeMinify;
+    var removeLine = options.removeLine === undefined ? true : options.removeLine;
+    
+    if (removeLine) {
+        str = str.replace(/\n/g, "").split("");
+    } else {
+       str = str.split("");
+    }
     var len = str.length;
     var out = [];
     var i = 0;
@@ -80,8 +101,8 @@ function minify(str) {
     }
 
     function includes2(char) {
-        var dt = ["=", "{", "(", "}", ")", "]", ">", "<", "!", ".", "$"];
-
+        var dt = ["=", "{", "(", "}", ")", "]", ">", "<", "!", "."];
+        if (extreme) dt.push("$");
         return dt.indexOf(char) != -1;
     }
 
@@ -100,7 +121,7 @@ function minify(str) {
             skip("'");
         } else if (char == "`") {
             skip("`");
-        } else if (char == "$") {
+        } else if (varReplace && char == "$") {
 
             var v = "";
             for (; i < len; i++) {
@@ -108,8 +129,6 @@ function minify(str) {
                 if (!includes3(str[i + 1])) break;
                 v += str[i + 1];
             }
-
-
             if (varMap[v]) {
                 out.push(varMap[v]);
             } else {
@@ -166,4 +185,67 @@ function minify(str) {
 
     }
     return out.join("");
+}
+function removeComments(str) {
+
+    str = str.split("");
+    var len = str.length;
+    var out = [];
+    var i = 0
+
+    function skip(match) {
+
+        var backslash = false;
+        out.push(match);
+
+        for (++i; i < len; i++) {
+            char = str[i];
+            out.push(char);
+            if (char === "\\") backslash = true;
+            else if (char === match && !backslash) {
+                break;
+            } else if (backslash) {
+                backslash = false;
+            }
+        }
+    }
+    for (; i < len; i++) {
+        var char = str[i];
+
+        if (char == "\"") {
+            skip("\"");
+        } else if (char == "'") {
+            skip("'");
+        } else if (char == "/") {
+            i++
+            if (str[i] == "/") {
+                for (++i; i < len; i++) {
+                    var c = str[i];
+                    if (c == "\n") {
+                        out.push("\n")
+                        break;
+                    }
+                }
+
+            } else if (str[i] == "*") {
+
+                var star = false;
+                for (++i; i < len; i++) {
+                    var c = str[i];
+                    if (c == "*") {
+                        star = true;
+                    } else
+                    if (c == "/" && star) {
+                        break;
+                    } else if (star) {
+                        star = false;
+                    }
+                }
+            }
+        } else {
+            out.push(char)
+        }
+
+    }
+    return out.join('').replace(/\n\s*\n/g, "\n");
 }

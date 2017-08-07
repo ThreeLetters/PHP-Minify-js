@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 /**
-* Minify PHP code into a small version
+* Minify PHP code
 *
 * @param {String} str - PHP code to minify
 * @param {Object} options - Extra options (optional)

@@ -102,7 +102,7 @@ function minify(str,options) {
 
     function includes2(char) {
         var dt = ["=", "{", "(", "}", ")", "]", ">", "<", "!", "."];
-        if (extreme) dt.push("$");
+        if (extreme) dt.push("$","&","|");
         return dt.indexOf(char) != -1;
     }
 

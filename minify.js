@@ -132,7 +132,7 @@ function minify(str,options) {
             }
             if (varMap[v]) {
                 out.push(varMap[v]);
-            } else {
+            } else if (v != "this") {
                 var found = false;
                 for (var j = i; j < len; j++) {
                     if (str[j + 1] == "=" || str[j + 1] == "," || str[j + 1] == ")") {
@@ -159,6 +159,8 @@ function minify(str,options) {
                 } else {
                     out.push("$" + v);
                 }
+            } else {
+                out.push("$" + v):
             }
             //console.log(v);
 

@@ -42,7 +42,7 @@ function minify(str,options) {
     var removeLine = options.removeLine === undefined ? true : options.removeLine;
     
     if (removeLine) {
-        str = str.replace(/\n/g, "").split("");
+        str = str.replace(/\n/g, "").replace(/\t/g,"").split("");
     } else {
        str = str.split("");
     }
@@ -144,7 +144,7 @@ function minify(str,options) {
                 }
                 if (found) {
                     for (var j = i - v.length - 1; j > 0; j--) {
-                        if (str[j] == "c" || str[j] == "e" || str[j] == "l") {
+                        if (str[j] == "c" || str[j] == "e" || str[j] == "l" || str[j] == "d") {
                             found = false;
                             break;
                         } else if (str[j] != " ") {

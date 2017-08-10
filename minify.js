@@ -160,7 +160,7 @@ function minify(str,options) {
                     out.push("$" + v);
                 }
             } else {
-                out.push("$" + v):
+                out.push("$" + v);
             }
             //console.log(v);
 
